@@ -1,0 +1,376 @@
+#+title: A very awful Emacs Config
+#+author: Jalen Moore
+
+* Junk GUI 
+
+Speaks for itself...
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-screen t)
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (toggle-scroll-bar 0)
+  (setq display-line-numbers-mode 1)
+  ; (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+  ; (setq ns-auto-hide-menu-bar nil)
+
+  ; Not sure where to put this...
+  (setenv "PATH" (concat "/opt/homebrew/bin:" (getenv "PATH")))
+  (setq exec-path (cons "/opt/homebrew/bin" exec-path))
+#+end_src
+
+* Custom Functions
+
+#+begin_src emacs-lisp
+(defun mjalen/remove_line_numbers ()
+    (interactive)
+    (display-line-numbers-mode 0))
+#+end_src
+
+* Garbage Collection
+
+#+begin_src emacs-lisp
+    (setq create-lockfiles nil)
+    (setq delete-by-moving-to-trash t)
+#+end_src
+
+* TODO Helm
+
+#+begin_src emacs-lisp
+(use-package helm
+	:straight t
+	:config)
+#+end_src
+ 
+* TODO Org Mode
+  
+The most beautiful feature of Emacs!
+
+#+begin_src emacs-lisp
+  (use-package org
+    :config
+    (add-hook 'org-mode-hook 'mjalen/remove_line_numbers)
+    (setq org-ellipsis " ▾")
+    (setq org-directory "~/org"))
+
+
+
+  (use-package org-superstar
+  	     :after org
+  	     :hook (org-mode . org-superstar-mode)
+  	     :custom
+  	     (org-superstar-remove-leading-stars t)
+  	     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  (use-package markdown-mode)
+#+end_src
+
+** Roam
+
+#+begin_src emacs-lisp
+  (use-package org-roam
+   :config
+   (setq org-roam-directory (file-truename "~/org"))
+   (define-key global-map (kbd "C-c n f") #'org-roam-node-find)
+   (define-key global-map (kbd "C-c n c") #'org-roam-capture)
+   (define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
+   (define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle))
+
+  (use-package org-pandoc-import
+    :straight (:host github
+  		   :repo "tecosaur/org-pandoc-import"
+  		   :files ("*.el" "filters" "preprocessors")))
+
+
+  ; Util
+  ;(add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
+  (defun my/org-add-ids-to-headlines-in-file ()
+    (interactive)
+    (org-map-entries 'org-id-get-create))
+
+  (defun my/org-pop-ids-to-file (file)
+    (interactive)
+    (find-file file)
+    (my/org-add-ids-to-headlines-in-file))
+
+  (require 'find-lisp)
+  (defun my/org-populate-ids ()
+    (interactive)
+    (mapc 'my/org-pop-ids-to-file (find-lisp-find-files "~/org/" "\\.org$")))
+      
+#+end_src
+
+
+** Old Org Config
+
+Keeping this in case I ever want to extract pieces of it.
+
+##+begin_src emacs-lisp
+      (use-package org-mobile-sync)
+	(use-package org
+	    :hook (org-mode . pandoc-mode)
+	    :config
+	    (setq org-ellipsis " ▾")
+	    (setq org-startup-truncated nil)
+	    (setq org-directory "~/org")
+	    (setq org-mobile-inbox-for-pull "~/org/flagged.org")
+	    (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+	    (org-reload))
+
+
+	  (setq org-confirm-babel-evaluate nil)
+	  (org-babel-do-load-languages
+	     'org-babel-load-languages
+	     '((emacs-lisp . t)
+	       (shell . t)
+	       (latex . t)
+	       (python . t)
+	       (java . t)))
+	  (use-package org-superstar
+	     :after org
+	     :hook (org-mode . org-superstar-mode)
+	     :custom
+	     (org-superstar-remove-leading-stars t)
+	     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+	  (defun jm/org-mode-visual-fill ()
+	    (setq visual-fill-column-width 100
+		  visual-fill-column-center-text t)
+	    (visual-fill-column-mode 1))
+
+	  (use-package visual-fill-column
+	    :hook (org-mode . jm/org-mode-visual-fill))
+
+    (with-eval-after-load 'org
+	(custom-set-faces
+	 '(org-block-begin-line
+	   ((t (:underline "#2c3535" :foreground "#adbbbb" :background "#0a0c0d"))))
+	 '(org-block
+	   ((t (:background "#111517"))))
+	 '(org-block-end-line
+	   ((t (:overline "#2c3535" :underline "#0a0c0d" :foreground "#adbbbb" :background "#0a0c0d"))))))
+##+end_src
+
+* Themes/colors
+
+#+begin_src emacs-lisp
+
+  (add-to-list 'default-frame-alist
+               '(font . "Fira Code-12"))
+  (set-frame-font "Fira Code-12")
+
+  ; Copied from mickeynp/ligature.el because I am too lazy to write all this.
+  (use-package ligature
+    :load-path "path-to-ligature-repo"
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Cascadia Code ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
+    
+  (use-package solo-jazz-theme
+    :ensure t
+    :config
+    (load-theme 'solo-jazz t))
+
+#+end_src
+
+* Modeline
+
+#+begin_src emacs-lisp
+  ; (display-battery-mode 1)
+  ; (setq battery-mode-line-format "%b%B")
+  ; (setq display-time-day-and-date t)
+  ; (setq display-time-format "%b %d %I:%M %p")
+  ; (display-time-mode 1)
+  (use-package doom-modeline
+    :demand t
+    :custom
+    (doom-modeline-buffer-file-name-style 'truncate-all)
+    (doom-modeline-bar-width (frame-parameter nil 'left-fringe))
+    (doom-modeline-height 12)
+    (doom-modeline-icon t)
+    (doom-modeline-icons-scale-factor 0.8)
+    (doom-modeline-mode t))
+#+end_src
+
+* Dashboard
+
+#+begin_src emacs-lisp
+    (use-package dashboard
+      :ensure t
+      :config
+      (dashboard-setup-startup-hook)
+      (setq dashboard-display-icons-p t)
+      (setq dashboard-icon-type 'nerd-icons))
+#+end_src
+
+* Which-key
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config (setq which-key-idle-delay 0.2))
+#+end_src
+
+* TODO General.el & Keybindings 
+** General.el
+
+ #+begin_src emacs-lisp
+ (use-package general
+   :config
+   (general-evil-setup nil))
+ #+end_src
+ 
+** Keybindings (used to be keys.el)
+
+ #+begin_src emacs-lisp
+      ;(load "/home/jalen/.emacs.d/keys.el")
+      (general-define-key
+	"M-<tab>" 'other-window
+	"M-s" 'switch-to-buffer-other-window
+	"C-<tab>" 'counsel-ibuffer
+	"<escape>" 'keyboard-escape-quit
+	"M-M" 'global-visual-fill-column-mode 
+	"M-x" 'helm-M-x
+	"C-<tab>" 'helm-buffers-list
+	"C-x C-f" 'helm-find-files)
+
+      (general-def org-mode-map
+       "C-SPC C-e" 'load-init
+       "C-<tab>" 'helm-buffers-list)
+
+   (general-def helm-map
+      "<tab>" 'helm-execute-persistent-action)
+ #+end_src
+ 
+* Keychord 
+
+#+begin_src emacs-lisp
+(use-package use-package-chords
+  :disabled
+  :config (key-chord-mode 1))
+#+end_src
+
+* EVIL Mode 
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    ;; (setq evil-want-keybinding 'nil)
+    (setq evil-want-C-u-scroll t)
+    ;; (setq evil-want-C-i-jump 'nil)
+    :config
+    (evil-mode 1)
+    ;; (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
+#+end_src
+
+* LaTeX
+
+#+begin_src emacs-lisp
+    ;;   (setq TeX-auto-save t
+    ;;         TeX-parse-self t
+    ;;         TeX-show-compilation nil
+    ;;         LaTeX-babel-hyphen nil ; Disable language-specific hyphen insertion.
+    ;;         LaTeX-csquotes-close-quote "}"
+    ;;         LaTeX-csquotes-open-quote "\\enquote{"
+    ;;         TeX-file-extensions '("Rnw" "rnw" "Snw" "snw" "tex" "sty" "cls" "ltx" "texi" "texinfo" "dtx"))
+    ;;   )
+
+    ;; (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+    ;; (global-unset-key "\C-z")
+    ;; (setq outline-minor-mode-prefix "\C-z")
+    ;; (add-hook 'LaTeX-mode-hook (lambda ()
+    ;;                               (TeX-fold-mode 1)))
+
+    (setq
+      TeX-auto-save t
+      Tex-parse-self t)
+
+    (setq-default TeX-master nil)
+    (add-hook 'Tex-mode-hook 'flyspell-mode)
+    (add-hook 'TeX-mode-hook
+    	  (lambda ()
+    	    (TeX-fold-mode 1)))
+
+    (add-hook 'TeX-mode-hook 'turn-on-reftex)
+    (use-package latex-pretty-symbols)
+
+  ; (use-package latex-preview-pane)
+#+end_src
+
+* SSH
+
+#+begin_src emacs-lisp
+  (setq rlogin-program "ssh")
+  (setq rlogin-process-connection-type t)
+#+end_src
+
+* Windows/Lines
+
+** Windows
+
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :defer 1 
+    :config
+    (default-text-scale-mode))
+#+end_src
+
+** Lines
+
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode)
+  (setq column-number-mode t)
+  (setq auto-fill-mode t)
+  (global-visual-line-mode)
+  (setq global-visual-fill-column-mode nil)
+  (set-display-table-slot standard-display-table 'wrap ?\ )
+#+end_src
+
+* Terminal
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :commands (vterm)
+    :ensure t
+    :init
+    (unless (file-exists-p (concat (file-name-directory (locate-library "vterm"))
+                                   "vterm-module.so"))
+      (message "Set vterm to install.")
+      (setq vterm-install t)))    
+
+  (add-hook 'vterm-mode-hook 'mjalen/remove_line_numbers)
+#+end_src
+
+* XWidgets
+
+Mom: "But we already have a web browser at home."
+Web Browser at home:
+
+#+begin_src emacs-lisp
+  (add-hook 'xwidget-webkit-mode-hook 'mjalen/remove_line_numbers)
+#+end_src
