@@ -15,8 +15,8 @@ Speaks for itself...
   ; (setq ns-auto-hide-menu-bar nil)
 
   ; Not sure where to put this...
-  (setenv "PATH" (concat "/opt/homebrew/bin:" (getenv "PATH")))
-  (setq exec-path (cons "/opt/homebrew/bin" exec-path))
+  (setenv "PATH" (concat "/opt/homebrew/bin:" "/Library/TeX/texbin:" (getenv "PATH")))
+  (setq exec-path (cons "/Library/Tex/texbin" (cons "/opt/homebrew/bin"  exec-path)))
 #+end_src
 
 * Custom Functions
