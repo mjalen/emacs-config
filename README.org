@@ -1,0 +1,3 @@
+* Emacs Config
+
+This is the coolest repository. I know, it's a bold statement from me, but it is true 😤.
