@@ -9,3 +9,6 @@ org-roam.db
 straight
 elpa
 .org-id-locations
+.DS_Store
+.lsp-session-*
+.dap-breakpoints

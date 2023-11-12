@@ -1,5 +1,15 @@
-#+title: A very awful Emacs Config
+#+title: An Awful Emacs Config
 #+author: Jalen Moore
+                _    
+    __   ___.--'_`.   
+   ( _`.'. -   'o` )    An Awful Emacs Config
+   _\.'_'      _.-'        by: Jalen Moore
+  ( \`. )    //\`          art by: Veronica Karlsson (Found at: www.asciiart.eu)
+   \_`-'`---'\\__,    
+    \`        `-\     
+     `                  
+
+This text editor bussin'!
 
 * Junk GUI 
 
@@ -27,6 +37,34 @@ Speaks for itself...
     (display-line-numbers-mode 0))
 #+end_src
 
+* Language Server 
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :commands lsp)
+
+  (use-package lsp-latex)
+
+  (use-package lsp-ui
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-sideline-show-diagnostics 1
+          lsp-ui-sideline-show-hover 1
+          lsp-ui-doc-enable 1
+          lsp-ui-peek-enable 1))
+  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+
+  (use-package dap-mode)
+
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config (setq which-key-idle-delay 0.2)) 
+      
+#+end_src
+
 * Garbage Collection
 
 #+begin_src emacs-lisp
@@ -37,9 +75,10 @@ Speaks for itself...
 * TODO Helm
 
 #+begin_src emacs-lisp
-(use-package helm
-	:straight t
-	:config)
+    (use-package helm
+    	:straight t
+    	:config
+        (helm-autoresize-mode t))
 #+end_src
  
 * TODO Org Mode
@@ -186,10 +225,19 @@ Keeping this in case I ever want to extract pieces of it.
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t))
     
-  (use-package solo-jazz-theme
+  ;; (use-package solo-jazz-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'solo-jazz t))
+
+  ;; (use-package leuven-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'leuven t))
+
+  (use-package plan9-theme
     :ensure t
-    :config
-    (load-theme 'solo-jazz t))
+    :config (load-theme 'plan9 t))
 
 #+end_src
 
@@ -201,35 +249,39 @@ Keeping this in case I ever want to extract pieces of it.
   ; (setq display-time-day-and-date t)
   ; (setq display-time-format "%b %d %I:%M %p")
   ; (display-time-mode 1)
-  (use-package doom-modeline
-    :demand t
-    :custom
-    (doom-modeline-buffer-file-name-style 'truncate-all)
-    (doom-modeline-bar-width (frame-parameter nil 'left-fringe))
-    (doom-modeline-height 12)
-    (doom-modeline-icon t)
-    (doom-modeline-icons-scale-factor 0.8)
-    (doom-modeline-mode t))
+
+  ;; (doom-modeline-mode -1)
+  ;; (use-package doom-modeline
+  ;;   :demand t
+  ;;   :custom
+  ;;   (doom-modeline-buffer-file-name-style 'truncate-all)
+  ;;   (doom-modeline-bar-width (frame-parameter nil 'left-fringe))
+  ;;   (doom-modeline-height 12)
+  ;;   (doom-modeline-icon t)
+  ;;   (doom-modeline-icons-scale-factor 0.8)
+  ;;   (doom-modeline-mode t))
+
+  (use-package mini-modeline
+    :config
+    (mini-modeline-mode t))
 #+end_src
 
 * Dashboard
 
 #+begin_src emacs-lisp
-    (use-package dashboard
-      :ensure t
-      :config
-      (dashboard-setup-startup-hook)
-      (setq dashboard-display-icons-p t)
-      (setq dashboard-icon-type 'nerd-icons))
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-display-icons-p t)
+    (setq dashboard-banner-logo-png "/Users/jalen/.emacs.d/images/drip.jpeg")
+    (setq dashboard-icon-type 'nerd-icons))
 #+end_src
 
 * Which-key
 
 #+begin_src emacs-lisp
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config (setq which-key-idle-delay 0.2))
+
 #+end_src
 
 * TODO General.el & Keybindings 
@@ -244,23 +296,25 @@ Keeping this in case I ever want to extract pieces of it.
 ** Keybindings (used to be keys.el)
 
  #+begin_src emacs-lisp
-      ;(load "/home/jalen/.emacs.d/keys.el")
-      (general-define-key
-	"M-<tab>" 'other-window
-	"M-s" 'switch-to-buffer-other-window
-	"C-<tab>" 'counsel-ibuffer
-	"<escape>" 'keyboard-escape-quit
-	"M-M" 'global-visual-fill-column-mode 
-	"M-x" 'helm-M-x
-	"C-<tab>" 'helm-buffers-list
-	"C-x C-f" 'helm-find-files)
-
-      (general-def org-mode-map
-       "C-SPC C-e" 'load-init
-       "C-<tab>" 'helm-buffers-list)
+   ;(load "/home/jalen/.emacs.d/keys.el")
+   (general-define-key
+   	"M-<tab>" 'other-window
+   	"M-s" 'switch-to-buffer-other-window
+   	"C-<tab>" 'counsel-ibuffer
+   	"<escape>" 'keyboard-escape-quit
+   	"M-M" 'global-visual-fill-column-mode 
+   	"M-x" 'helm-M-x
+   	"C-<tab>" 'helm-buffers-list
+           "C-s" 'helm-occur
+   	"C-x C-f" 'helm-find-files)
+   	
+   (general-def org-mode-map
+    "C-SPC C-e" 'load-init
+    "C-<tab>" 'helm-buffers-list)
 
    (general-def helm-map
-      "<tab>" 'helm-execute-persistent-action)
+     "C-z" 'helm-execute-persistent-action)
+
  #+end_src
  
 * Keychord 
@@ -311,10 +365,17 @@ Keeping this in case I ever want to extract pieces of it.
       Tex-parse-self t)
 
     (setq-default TeX-master nil)
-    (add-hook 'Tex-mode-hook 'flyspell-mode)
-    (add-hook 'TeX-mode-hook
-    	  (lambda ()
-    	    (TeX-fold-mode 1)))
+
+    (use-package flyspell)
+
+    ; convenience for adding hooks to both tex/latex modes.
+    (defun mjalen/hook-latex (hook)
+      (let ((hook-list (quote (tex-mode-hook latex-mode-hook))))
+        (mapcar '(lambda (h) (add-hook 'h 'hook)) hook-list)))
+
+    (mjalen/hook-latex 'tex-fold-mode-hook)
+    (mjalen/hook-latex 'flyspell-mode-hook)
+    (mjalen/hook-latex 'lsp-mode-hook)
 
     (add-hook 'TeX-mode-hook 'turn-on-reftex)
     (use-package latex-pretty-symbols)
@@ -346,9 +407,32 @@ Keeping this in case I ever want to extract pieces of it.
   (global-display-line-numbers-mode)
   (setq column-number-mode t)
   (setq auto-fill-mode t)
-  (global-visual-line-mode)
+  (global-visual-line-mode t)
+  (global-hl-line-mode t)
+  (blink-cursor-mode t)
   (setq global-visual-fill-column-mode nil)
   (set-display-table-slot standard-display-table 'wrap ?\ )
+#+end_src
+
+* Buffers
+
+#+begin_src emacs-lisp
+
+  ;; (defun mjalen/reposition-minibuffer-to-cursor ()
+  ;;   (custom-set-variables
+  ;;     '(mini-frame-show-parameters
+  ;;        '((top . (what-line))
+  ;;          (width . 1.0)
+  ;;          (left . 0.5)
+  ;;          (height . 15)))))
+
+  ;; (use-package mini-frame
+  ;;    :config
+  ;;    (mini-frame-mode t))
+
+  (setq helm-display-function 'helm-display-buffer-in-own-frame
+        helm-display-buffer-reuse-frame t
+        helm-use-undecorated-frame-option t)
 #+end_src
 
 * Terminal
